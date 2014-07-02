@@ -24,28 +24,28 @@ All notificators:
 
 ```go
 type gnomeNotificator struct {
-	IconPath string
-	Title    string
+    IconPath string
+    Title    string
     Text     string
 }
 
 type kdeNotificator struct {
-	IconPath string
-	Title    string
-	Text     string
+    IconPath string
+    Title    string
+    Text     string
 }
 
 type osxNotificator struct {
-	IconPath string
-	AppName  string
-	Title    string
-	Text     string
+    IconPath string
+    AppName  string
+    Title    string
+    Text     string
 }
 
 type windowsNotificator struct {
-	IconPath string
-	Title    string
-	Text     string
+    IconPath string
+    Title    string
+    Text     string
 }
 ```
 
