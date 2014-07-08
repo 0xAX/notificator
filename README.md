@@ -13,39 +13,20 @@ usage
 ```go
 package main
 
-import "github.com/0xAX/notificator"
+import (
+  "github.com/0xAX/notificator"
+)
+
+var notify *notificator.Notificator
 
 func main() {
-  notificator.Push(&gnomeNotificator{"/home/user/icon.png", "title", "text"})
-}
-```
 
-All notificators:
+  notify = notificator.New(notificator.Options{
+    DefaultIcon: "icon/default.png",
+    AppName:     "My test App",
+  })
 
-```go
-type gnomeNotificator struct {
-    IconPath string
-    Title    string
-    Text     string
-}
-
-type kdeNotificator struct {
-    IconPath string
-    Title    string
-    Text     string
-}
-
-type osxNotificator struct {
-    IconPath string
-    AppName  string
-    Title    string
-    Text     string
-}
-
-type windowsNotificator struct {
-    IconPath string
-    Title    string
-    Text     string
+  notify.Push("title", "text", "/home/user/icon.png")
 }
 ```
 
