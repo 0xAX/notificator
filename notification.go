@@ -1,96 +1,69 @@
-package notification
+package notificator
 
-import "reflect"
-import "os/exec"
+import (
+	"os/exec"
+	"runtime"
+)
 
-const defaultIcon = "icon/golang.png"
+type Options struct {
+	DefaultIcon string
+	AppName     string
+}
+
+type notifier interface {
+	push(title string, text string, iconPath string)
+}
 
 type Notificator struct {
-    GnomeNotificator *gnomeNotificator
-    KdeNotificator   *kdeNotificator
-    OSXNotificator   *osxNotificator
-    WindowsNotificator *windowsNotificator
+	notifier    notifier
+	defaultIcon string
 }
 
-type gnomeNotificator struct {
-    IconPath string
-    Title    string
-    Text     string
-}
+func (n Notificator) Push(title string, text string, iconPath string) {
 
-type kdeNotificator struct {
-    IconPath string
-    Title    string
-    Text     string
+	icon := n.defaultIcon
+
+	if iconPath != "" {
+		icon = iconPath
+	}
+
+	n.notifier.push(title, text, icon)
 }
 
 type osxNotificator struct {
-    IconPath string
-    AppName  string
-    Title    string
-    Text     string
+	AppName string
 }
 
-type windowsNotificator struct {
-    IconPath string
-    Title    string
-    Text     string
+func (o osxNotificator) push(title string, text string, iconPath string) {
+	exec.Command("growlnotify", "-n", o.AppName, "--image", iconPath, "-m", title, text)
 }
 
-func Push(notificator interface{}) {
-    // get notificator type
-    n := reflect.TypeOf(notificator).String()
-    // check notificator
-    if  n == "*notification.gnomeNotificator" {
-        notify := &Notificator{notificator.(*gnomeNotificator), nil, nil, nil}
-        
-        var icon string = ""
+type linuxNotificator struct{}
 
-        if notify.GnomeNotificator.IconPath == "" {
-            icon = defaultIcon
-        } else {
-            icon = notify.GnomeNotificator.IconPath
-        }
+func (l linuxNotificator) push(title string, text string, iconPath string) {
+	exec.Command("notify-send", "-i", iconPath, title, text)
+}
 
-        exec.Command("notify-send", "-i", icon, notify.GnomeNotificator.Title, notify.GnomeNotificator.Text)
-        
-    } else if n == "*notification.kdeNotificator" {
-        notify := &Notificator{nil, notificator.(*kdeNotificator), nil, nil}
+type windowsNotificator struct{}
 
-        var icon string = ""
-        
-        if notify.KdeNotificator.IconPath == "" {
-            icon = defaultIcon
-        } else {
-            icon = notify.KdeNotificator.IconPath
-        }
+func (w windowsNotificator) push(title string, text string, iconPath string) {
+	exec.Command("growlnotify", "/i:", iconPath, "/t:", title, text)
+}
 
-        exec.Command("kdialog", "--icon", icon, "--title", notify.KdeNotificator.Title, "--passivepopup", 
-                     notify.KdeNotificator.Text)
-    } else if n == "*notification.osxNotificator" {
-        notify := &Notificator{nil, nil, notificator.(*osxNotificator), nil}
+func New(o Options) *Notificator {
 
-        var icon string = ""
+	var notifier notifier
 
-        if notify.OSXNotificator.IconPath == "" {
-            icon = defaultIcon
-        } else {
-            icon = notify.OSXNotificator.IconPath
-        }
+	switch runtime.GOOS {
 
-        exec.Command("growlnotify", "-n", notify.OSXNotificator.AppName, "--image", icon, "-m", 
-                     notify.OSXNotificator.Title, notify.OSXNotificator.Text)
-    } else {
-        notify := &Notificator{nil, nil, nil, notificator.(*windowsNotificator)}
-    
-        var icon string
-        
-        if notify.WindowsNotificator.IconPath == "" {
-            icon = defaultIcon
-        } else {
-            icon = notify.WindowsNotificator.IconPath
-        }
-        
-        exec.Command("growlnotify", "/i:", icon, "/t:", notify.WindowsNotificator.Title, notify.WindowsNotificator.Text)
-    }
+	case "darwin":
+		notifier = osxNotificator{AppName: o.AppName}
+	case "linux":
+		notifier = linuxNotificator{}
+	case "windows":
+		notifier = windowsNotificator{}
+
+	}
+
+	return &Notificator{notifier: notifier, defaultIcon: o.DefaultIcon}
 }
