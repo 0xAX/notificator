@@ -7,7 +7,7 @@ Desktop notification with golang for:
   * Mac OS X with `growlnotify`;
   * Linux with `notify-send` for gnome and `kdialog` for kde.
 
-usage
+Usage
 ------
 
 ```go
@@ -30,12 +30,12 @@ func main() {
 }
 ```
 
-todo
+TODO
 -----
 
   * Add more options for different notificators.
 
-contribution
+Сontribution
 ------------
 
   * Fork;
