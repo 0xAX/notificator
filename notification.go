@@ -11,7 +11,7 @@ type Options struct {
 }
 
 type notifier interface {
-	push(title string, text string, iconPath string)
+	push(title string, text string, iconPath string) *exec.Cmd
 }
 
 type Notificator struct {
@@ -19,7 +19,7 @@ type Notificator struct {
 	defaultIcon string
 }
 
-func (n Notificator) Push(title string, text string, iconPath string) {
+func (n Notificator) Push(title string, text string, iconPath string) error {
 
 	icon := n.defaultIcon
 
@@ -27,27 +27,31 @@ func (n Notificator) Push(title string, text string, iconPath string) {
 		icon = iconPath
 	}
 
-	n.notifier.push(title, text, icon)
+	err := n.notifier.push(title, text, icon).Run()
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 type osxNotificator struct {
 	AppName string
 }
 
-func (o osxNotificator) push(title string, text string, iconPath string) {
-	exec.Command("growlnotify", "-n", o.AppName, "--image", iconPath, "-m", title, text)
+func (o osxNotificator) push(title string, text string, iconPath string) *exec.Cmd {
+	return exec.Command("growlnotify", "-n", o.AppName, "--image", iconPath, "-m", title, text)
 }
 
 type linuxNotificator struct{}
 
-func (l linuxNotificator) push(title string, text string, iconPath string) {
-	exec.Command("notify-send", "-i", iconPath, title, text)
+func (l linuxNotificator) push(title string, text string, iconPath string) *exec.Cmd {
+	return exec.Command("notify-send", "-i", iconPath, title, text)
 }
 
 type windowsNotificator struct{}
 
-func (w windowsNotificator) push(title string, text string, iconPath string) {
-	exec.Command("growlnotify", "/i:", iconPath, "/t:", title, text)
+func (w windowsNotificator) push(title string, text string, iconPath string) *exec.Cmd {
+	return exec.Command("growlnotify", "/i:", iconPath, "/t:", title, text)
 }
 
 func New(o Options) *Notificator {
