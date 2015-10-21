@@ -26,7 +26,7 @@ func main() {
     AppName:     "My test App",
   })
 
-  notify.Push("title", "text", "/home/user/icon.png")
+  notify.Push("title", "text", "/home/user/icon.png", notificator.UR_CRITICAL)
 }
 ```
 
