@@ -1,11 +1,11 @@
 notificator
 ===========================
 
-Desktop notification with golang for:
+Desktop notification with Golang for:
 
   * Windows with `growlnotify`;
-  * Mac OS X with `growlnotify`;
-  * Linux with `notify-send` for gnome and `kdialog` for kde.
+  * Mac OS X with `terminal-notifier` (if installed) or `osascript` (native, 10.9 Mavericks or Up.);
+  * Linux with `notify-send` for Gnome and `kdialog` for Kde.
 
 Usage
 ------
