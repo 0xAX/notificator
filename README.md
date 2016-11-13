@@ -4,7 +4,7 @@ notificator
 Desktop notification with Golang for:
 
   * Windows with `growlnotify`;
-  * Mac OS X with `terminal-notifier` (if installed) or `osascript` (native);
+  * Mac OS X with `terminal-notifier` (if installed) or `osascript` (native, 10.9 Mavericks or Up.);
   * Linux with `notify-send` for Gnome and `kdialog` for Kde.
 
 Usage
