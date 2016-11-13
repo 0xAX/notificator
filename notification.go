@@ -163,9 +163,11 @@ func CheckMacOSVersion() bool {
 	major, _ := strconv.Atoi(version[0])
 	minor, _ := strconv.Atoi(version[1])
 
-	if major != 10 || minor < 9 {
+	if major < 10 {
+    return false
+	} else if major == 10 && minor < 9 {
     return false
 	} else {
-    return true
+		return true
 	}
 }
