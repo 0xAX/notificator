@@ -3,6 +3,7 @@ package notificator
 import (
 	"os/exec"
 	"runtime"
+	"fmt"
 )
 
 type Options struct {
@@ -35,9 +36,9 @@ func (n Notificator) Push(title string, text string, iconPath string, urgency st
 	if urgency == UR_CRITICAL {
 		return n.notifier.pushCritical(title, text, icon).Run()
 	}
-	
+
 	return n.notifier.push(title, text, icon).Run()
-	
+
 }
 
 type osxNotificator struct {
@@ -45,12 +46,23 @@ type osxNotificator struct {
 }
 
 func (o osxNotificator) push(title string, text string, iconPath string) *exec.Cmd {
-	return exec.Command("growlnotify", "-n", o.AppName, "--image", iconPath, "-m", title)
+
+	check_term_notif := exec.Command("which", "terminal-notifier");
+	err := check_term_notif.Start()
+
+	if err != nil {
+		return exec.Command("terminal-notifier", "-title", o.AppName, "-message", title)
+	} else {
+		notification := fmt.Sprintf("display notification %s with title %s", o.AppName, title);
+		return exec.Command("osascript", "-e", notification)
+	}
+
+	// return exec.Command("growlnotify", "-n", o.AppName, "--image", iconPath, "-m", title)
 }
 
 // Causes the notification to stick around until clicked.
 func (o osxNotificator) pushCritical(title string, text string, iconPath string) *exec.Cmd {
-	return exec.Command("notify-send", "-i", iconPath, title, text, "--sticky", "-p", "2")	
+	return exec.Command("notify-send", "-i", iconPath, title, text, "--sticky", "-p", "2")
 }
 
 type linuxNotificator struct{}
@@ -61,7 +73,7 @@ func (l linuxNotificator) push(title string, text string, iconPath string) *exec
 
 // Causes the notification to stick around until clicked.
 func (l linuxNotificator) pushCritical(title string, text string, iconPath string) *exec.Cmd {
-	return exec.Command("notify-send", "-i", iconPath, title, text, "-u", "critical")	
+	return exec.Command("notify-send", "-i", iconPath, title, text, "-u", "critical")
 }
 
 type windowsNotificator struct{}
@@ -72,24 +84,24 @@ func (w windowsNotificator) push(title string, text string, iconPath string) *ex
 
 // Causes the notification to stick around until clicked.
 func (w windowsNotificator) pushCritical(title string, text string, iconPath string) *exec.Cmd {
-	return exec.Command("notify-send", "-i", iconPath, title, text, "/s", "true", "/p", "2")	
+	return exec.Command("notify-send", "-i", iconPath, title, text, "/s", "true", "/p", "2")
 }
 
 
 func New(o Options) *Notificator {
 
-	var notifier notifier
+	var Notifier notifier
 
 	switch runtime.GOOS {
 
 	case "darwin":
-		notifier = osxNotificator{AppName: o.AppName}
+		Notifier = osxNotificator{AppName: o.AppName}
 	case "linux":
-		notifier = linuxNotificator{}
+		Notifier = linuxNotificator{}
 	case "windows":
-		notifier = windowsNotificator{}
+		Notifier = windowsNotificator{}
 
 	}
 
-	return &Notificator{notifier: notifier, defaultIcon: o.DefaultIcon}
+	return &Notificator{notifier: Notifier, defaultIcon: o.DefaultIcon}
 }
