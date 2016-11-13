@@ -1,11 +1,11 @@
 package notificator
 
 import (
+	"fmt"
 	"os/exec"
 	"runtime"
-	"fmt"
-	"strings"
 	"strconv"
+	"strings"
 )
 
 type Options struct {
@@ -14,8 +14,8 @@ type Options struct {
 }
 
 const (
-	UR_NORMAL   =	"normal"
-	UR_CRITICAL	=	"critical"
+	UR_NORMAL   = "normal"
+	UR_CRITICAL = "critical"
 )
 
 type notifier interface {
@@ -54,7 +54,7 @@ func (o osxNotificator) push(title string, text string, iconPath string) *exec.C
 	term_notif := CheckTermNotif()
 	os_version_check := CheckMacOSVersion()
 
-  // if terminal-notifier exists, use it.
+	// if terminal-notifier exists, use it.
 	// else, fall back to osascript. (Mavericks and later.)
 
 	if term_notif == true {
@@ -66,26 +66,26 @@ func (o osxNotificator) push(title string, text string, iconPath string) *exec.C
 
 	// finally falls back to growlnotify.
 
-  return exec.Command("growlnotify", "-n", o.AppName, "--image", iconPath, "-m", title)
+	return exec.Command("growlnotify", "-n", o.AppName, "--image", iconPath, "-m", title)
 }
 
 // Causes the notification to stick around until clicked.
 func (o osxNotificator) pushCritical(title string, text string, iconPath string) *exec.Cmd {
 
-  // same function as above...
+	// same function as above...
 
 	term_notif := CheckTermNotif()
 	os_version_check := CheckMacOSVersion()
 
 	if term_notif == true {
 		// timeout set to 30 seconds, to show the importance of the notification
-		return exec.Command("terminal-notifier", "-title", o.AppName, "-message", title, "-subtitle", title ,"-timeout", "30")
+		return exec.Command("terminal-notifier", "-title", o.AppName, "-message", title, "-subtitle", title, "-timeout", "30")
 	} else if os_version_check == true {
 		notification := fmt.Sprintf("display notification \"%s\" with title \"%s\" subtitle \"%s\"", text, o.AppName, title)
 		return exec.Command("osascript", "-e", notification)
 	}
 
-  return exec.Command("growlnotify", "-n", o.AppName, "--image", iconPath, "-m", title)
+	return exec.Command("growlnotify", "-n", o.AppName, "--image", iconPath, "-m", title)
 
 }
 
@@ -111,7 +111,6 @@ func (w windowsNotificator) pushCritical(title string, text string, iconPath str
 	return exec.Command("notify-send", "-i", iconPath, title, text, "/s", "true", "/p", "2")
 }
 
-
 func New(o Options) *Notificator {
 
 	var Notifier notifier
@@ -135,10 +134,10 @@ func New(o Options) *Notificator {
 func CheckTermNotif() bool {
 	// Checks if terminal-notifier exists, and is accessible.
 
-	check_term_notif := exec.Command("which", "terminal-notifier");
+	check_term_notif := exec.Command("which", "terminal-notifier")
 	err := check_term_notif.Start()
 
-  if err != nil {
+	if err != nil {
 		return false
 	} else {
 		err = check_term_notif.Wait()
@@ -147,26 +146,26 @@ func CheckTermNotif() bool {
 		}
 	}
 	// no error, so return true. (terminal-notifier exists)
-  return true
+	return true
 }
 
 func CheckMacOSVersion() bool {
 	// Checks if the version of macOS is 10.9 or Higher (osascript support for notifications.)
 
-	cmd := exec.Command("sw_vers", "-productVersion");
+	cmd := exec.Command("sw_vers", "-productVersion")
 	check, _ := cmd.Output()
 
 	version := strings.Split(string(check), ".")
 
-  // semantic versioning of macOS
+	// semantic versioning of macOS
 
 	major, _ := strconv.Atoi(version[0])
 	minor, _ := strconv.Atoi(version[1])
 
 	if major < 10 {
-    return false
+		return false
 	} else if major == 10 && minor < 9 {
-    return false
+		return false
 	} else {
 		return true
 	}
