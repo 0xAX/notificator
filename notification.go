@@ -58,7 +58,7 @@ func (o osxNotificator) push(title string, text string, iconPath string) *exec.C
 	// else, fall back to osascript. (Mavericks and later.)
 
 	if term_notif == true {
-		return exec.Command("terminal-notifier", "-title", o.AppName, "-message", text, "-subtitle", title)
+		return exec.Command("terminal-notifier", "-title", o.AppName, "-message", text, "-subtitle", title, "-appIcon", iconPath)
 	} else if os_version_check == true {
 		notification := fmt.Sprintf("display notification \"%s\" with title \"%s\" subtitle \"%s\"", text, o.AppName, title)
 		return exec.Command("osascript", "-e", notification)
