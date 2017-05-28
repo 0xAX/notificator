@@ -133,17 +133,8 @@ func New(o Options) *Notificator {
 
 func CheckTermNotif() bool {
 	// Checks if terminal-notifier exists, and is accessible.
-
-	check_term_notif := exec.Command("which", "terminal-notifier")
-	err := check_term_notif.Start()
-
-	if err != nil {
+	if err := exec.Command("which", "terminal-notifier").Run(); err != nil {
 		return false
-	} else {
-		err = check_term_notif.Wait()
-		if err != nil {
-			return false
-		}
 	}
 	// no error, so return true. (terminal-notifier exists)
 	return true
