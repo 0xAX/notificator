@@ -146,7 +146,7 @@ func CheckMacOSVersion() bool {
 	cmd := exec.Command("sw_vers", "-productVersion")
 	check, _ := cmd.Output()
 
-	version := strings.Split(string(check), ".")
+	version := strings.Split(strings.TrimSpace(string(check)), ".")
 
 	// semantic versioning of macOS
 
