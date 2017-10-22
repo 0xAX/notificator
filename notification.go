@@ -60,6 +60,9 @@ func (o osxNotificator) push(title string, text string, iconPath string) *exec.C
 	if term_notif == true {
 		return exec.Command("terminal-notifier", "-title", o.AppName, "-message", text, "-subtitle", title, "-appIcon", iconPath)
 	} else if os_version_check == true {
+		title = strings.Replace(title, `"`, `\"`,  -1)
+		text = strings.Replace(text, `"`, `\"`,  -1)
+		
 		notification := fmt.Sprintf("display notification \"%s\" with title \"%s\" subtitle \"%s\"", text, o.AppName, title)
 		return exec.Command("osascript", "-e", notification)
 	}
