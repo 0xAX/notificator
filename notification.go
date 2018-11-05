@@ -111,7 +111,7 @@ func (w windowsNotificator) push(title string, text string, iconPath string) *ex
 
 // Causes the notification to stick around until clicked.
 func (w windowsNotificator) pushCritical(title string, text string, iconPath string) *exec.Cmd {
-	return exec.Command("notify-send", "-i", iconPath, title, text, "/s", "true", "/p", "2")
+	return exec.Command("growlnotify", "/i:", iconPath, "/t:", title, text, "/s", "true", "/p", "2")
 }
 
 func New(o Options) *Notificator {
