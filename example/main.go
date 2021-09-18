@@ -1,8 +1,9 @@
 package main
 
 import (
-	"../../notificator"
 	"log"
+
+	"github.com/0xAX/notificator"
 )
 
 var notify *notificator.Notificator
